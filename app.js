@@ -1,11 +1,31 @@
-const { templateQuestion, saveContact } = require('./contacts');
+const { describe } = require('yargs');
+const yargs = require('yargs');
+const { saveContact } = require('./contacts');
 
-const main = async () => {
-  const nama = await templateQuestion('Masukkan Nama Anda: ');
-  const email = await templateQuestion('Masukkan Email Anda: ');
-  const noHP = await templateQuestion('Masukkan noHP Anda: ');
+yargs.command({
+  command: 'add',
+  describe: 'menambahkan contact baru',
+  builder: {
+    nama: {
+      describe: 'Nama lengkap',
+      demandOption: true,
+      type: 'string',
+    },
+    email: {
+      describe: 'email',
+      demandOption: false,
+      type: 'string',
+    },
+    noHP: {
+      describe: 'Nomor HP',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    const { nama, email, noHP } = argv;
+    saveContact(nama, email, noHP);
+  },
+});
 
-  saveContact(nama, email, noHP);
-};
-
-main();
+yargs.parse();
