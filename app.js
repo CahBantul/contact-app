@@ -15,6 +15,13 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/contacts', (req, res) => {
+  res.render('contact', {
+    layout: 'layouts/main-layouts',
+    title: 'Contacts Page',
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
