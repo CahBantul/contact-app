@@ -19,6 +19,9 @@
   "homepage": "https://github.com/CahBantul/contact-app#readme",
   "dependencies": {
     "chalk": "^4.1.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "express-ejs-layouts": "^2.5.0",
     "validator": "^13.5.2",
     "yargs": "^16.2.0"
   }
