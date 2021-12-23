@@ -8,6 +8,7 @@ const port = 3000;
 app.set('view engine', 'ejs');
 app.use(expressLayouts); //third party middleware
 app.use(express.static('public')); // build in middleware
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.render('index', {
@@ -16,6 +17,7 @@ app.get('/', (req, res) => {
   });
 });
 
+// halaman seluruh kontak
 app.get('/contacts', (req, res) => {
   const contacts = loadContact();
   res.render('contact', {
@@ -25,6 +27,23 @@ app.get('/contacts', (req, res) => {
   });
 });
 
+// halaman form tambah data kontak
+app.get('/contact/add', (req, res) => {
+  // const contact = findContact(req.params.nama);
+  res.render('add-contact', {
+    layout: 'layouts/main-layouts',
+    title: 'Halaman Tambah Contact',
+    // contact,
+  });
+});
+
+// proses data contact
+app.post('/contact', (req, res) => {
+  addContact(req.body);
+  res.redirect('/contacts');
+});
+
+// halaman detail kontak
 app.get('/contact/:nama', (req, res) => {
   const contact = findContact(req.params.nama);
   res.render('detail', {

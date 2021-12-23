@@ -12,6 +12,9 @@ if (!fs.existsSync(dataPath)) {
   fs.writeFileSync(dataPath, '[]', 'utf-8');
 }
 
+// save kontak
+const saveContacts = (contacts) => {};
+
 // ambil semua data kontak
 const loadContact = () => {
   const fileBuffer = fs.readFileSync(dataPath, 'utf-8');
