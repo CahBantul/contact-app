@@ -1,1 +1,4 @@
-[{"nama":"fardan nozami Ajitama","email":"okok@gmail.com","noHP":"081229811979"}]
+[
+  { "nama": "fardan", "noHP": "081221", "email": "fardan@gmail.com" },
+  { "nama": "nozami", "noHP": "081221", "email": "nozami@gmail.com" }
+]
