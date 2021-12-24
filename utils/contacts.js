@@ -13,7 +13,9 @@ if (!fs.existsSync(dataPath)) {
 }
 
 // save kontak
-const saveContacts = (contacts) => {};
+const saveContacts = (contacts) => {
+  fs.writeFileSync('data/contacts.json', JSON.stringify(contacts));
+};
 
 // ambil semua data kontak
 const loadContact = () => {
@@ -31,4 +33,19 @@ const findContact = (nama) => {
   return contact;
 };
 
-module.exports = { loadContact, findContact };
+// menambahkan data kontak baru
+const addContact = (contact) => {
+  const contacts = loadContact();
+  contacts.push(contact);
+  saveContacts(contacts);
+};
+
+// cek nama duplikat
+const cekDuplikat = (nama) => {
+  const contacts = loadContact();
+  return contacts.find(
+    (contact) => contact.nama.toLowerCase() === nama.toLowerCase()
+  );
+};
+
+module.exports = { loadContact, findContact, addContact, cekDuplikat };
