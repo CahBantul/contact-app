@@ -7,6 +7,9 @@ const {
   cekDuplikat,
 } = require('./utils/contacts');
 const { body, validationResult, check } = require('express-validator');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const flash = require('connect-flash');
 
 const app = express();
 const port = 3000;
@@ -17,6 +20,20 @@ app.use(expressLayouts); //third party middleware
 app.use(express.static('public')); // build in middleware
 app.use(express.urlencoded({ extended: true }));
 
+// konfigurasi flash
+app.use(cookieParser('secret'));
+app.use(
+  session({
+    cookie: { maxAge: 6000 },
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+
+app.use(flash());
+
+// route home
 app.get('/', (req, res) => {
   res.render('index', {
     layout: 'layouts/main-layouts',
@@ -31,6 +48,7 @@ app.get('/contacts', (req, res) => {
     layout: 'layouts/main-layouts',
     title: 'Contacts Page',
     contacts,
+    msg: req.flash('msg'),
   });
 });
 
@@ -71,6 +89,8 @@ app.post(
       });
     } else {
       addContact(req.body);
+      // kirimkan flash message
+      req.flash('msg', 'Data kontak berhasil ditambahkan!');
       res.redirect('/contacts');
     }
   }
