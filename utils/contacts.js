@@ -58,10 +58,23 @@ const deleteContact = (nama) => {
   saveContacts(newContacts);
 };
 
+// ubah contact
+const updateContact = (newContacts) => {
+  const contacts = loadContact();
+  // hilangkan kontak lama berdasarkan oldName
+  const filteredContacts = contacts.filter(
+    (contact) => contact.nama != newContacts.oldName
+  );
+  delete newContacts.oldName;
+  filteredContacts.push(newContacts);
+  saveContacts(filteredContacts);
+};
+
 module.exports = {
   loadContact,
   findContact,
   addContact,
   cekDuplikat,
   deleteContact,
+  updateContact,
 };

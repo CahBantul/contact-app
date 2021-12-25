@@ -16,8 +16,14 @@
           <h6 class="card-subtitle mb-2 text-muted"><%= contact.noHP %></h6>
           <p class="card-text"><%= contact.email %></p>
           <a
+            href="/contact/edit/<%= contact.nama  %>"
+            class="btn btn-primary badge"
+            >ubah</a
+          >
+          <a
             href="/contact/delete/<%= contact.nama  %>"
-            class="btn btn-danger badge" onclick="return confirm('yakin?')"
+            class="btn btn-danger badge"
+            onclick="return confirm('yakin?')"
             >hapus</a
           >
           <a href="/contacts" class="card-link d-block mt-3"
