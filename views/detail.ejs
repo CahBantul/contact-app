@@ -15,7 +15,12 @@
           <h5 class="card-title"><%= contact.nama %></h5>
           <h6 class="card-subtitle mb-2 text-muted"><%= contact.noHP %></h6>
           <p class="card-text"><%= contact.email %></p>
-          <a href="/contacts" class="card-link"
+          <a
+            href="/contact/delete/<%= contact.nama  %>"
+            class="btn btn-danger badge" onclick="return confirm('yakin?')"
+            >hapus</a
+          >
+          <a href="/contacts" class="card-link d-block mt-3"
             >&laquo; kembali ke daftar kontak</a
           >
         </div>

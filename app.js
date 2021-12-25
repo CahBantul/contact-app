@@ -5,6 +5,7 @@ const {
   findContact,
   addContact,
   cekDuplikat,
+  deleteContact,
 } = require('./utils/contacts');
 const { body, validationResult, check } = require('express-validator');
 const session = require('express-session');
@@ -95,6 +96,18 @@ app.post(
     }
   }
 );
+
+// proses delete kontak
+app.get('/contact/delete/:nama', (req, res) => {
+  const contact = findContact(req.params.nama);
+  if (!contact) {
+    res.status(404);
+  } else {
+    deleteContact(req.params.nama);
+    req.flash('msg', 'Data kontak berhasil dihapus!');
+    res.redirect('/contacts');
+  }
+});
 
 // halaman detail kontak
 app.get('/contact/:nama', (req, res) => {

@@ -1,3 +1,4 @@
+const res = require('express/lib/response');
 const fs = require('fs');
 
 // membuat folder data jika belum ada
@@ -48,4 +49,19 @@ const cekDuplikat = (nama) => {
   );
 };
 
-module.exports = { loadContact, findContact, addContact, cekDuplikat };
+// Hapus kontak
+const deleteContact = (nama) => {
+  const contacts = loadContact();
+  const newContacts = contacts.filter(
+    (contact) => contact.nama.toLowerCase() != nama.toLowerCase()
+  );
+  saveContacts(newContacts);
+};
+
+module.exports = {
+  loadContact,
+  findContact,
+  addContact,
+  cekDuplikat,
+  deleteContact,
+};
