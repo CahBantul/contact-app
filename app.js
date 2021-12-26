@@ -1,20 +1,22 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
-const {
-  loadContact,
-  findContact,
-  addContact,
-  cekDuplikat,
-  deleteContact,
-  updateContact,
-} = require('./utils/contacts');
+
 const { body, validationResult, check } = require('express-validator');
+
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 
+require('./utils/db');
+const Contact = require('./model/contacts');
+
+const methodOverride = require('method-override');
+
 const app = express();
 const port = 3000;
+
+// setup method override
+app.use(methodOverride('_method'));
 
 // gunakan ejs
 app.set('view engine', 'ejs');
@@ -44,8 +46,8 @@ app.get('/', (req, res) => {
 });
 
 // halaman seluruh kontak
-app.get('/contacts', (req, res) => {
-  const contacts = loadContact();
+app.get('/contacts', async (req, res) => {
+  const contacts = await Contact.find();
   res.render('contact', {
     layout: 'layouts/main-layouts',
     title: 'Contacts Page',
@@ -56,11 +58,9 @@ app.get('/contacts', (req, res) => {
 
 // halaman form tambah data kontak
 app.get('/contact/add', (req, res) => {
-  // const contact = findContact(req.params.nama);
   res.render('add-contact', {
     layout: 'layouts/main-layouts',
     title: 'Halaman Tambah Contact',
-    // contact,
   });
 });
 
@@ -68,9 +68,8 @@ app.get('/contact/add', (req, res) => {
 app.post(
   '/contact',
   [
-    body('nama').custom((value) => {
-      const duplikat = cekDuplikat(value);
-      console.log(duplikat);
+    body('nama').custom(async (value) => {
+      const duplikat = await Contact.findOne({ nama: value });
 
       if (duplikat) {
         throw new Error('Nama kontak sudah digunakan!');
@@ -83,36 +82,32 @@ app.post(
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // return res.status(400).json({ errors: errors.array() });
       res.render('add-contact', {
         layout: 'layouts/main-layouts',
         title: 'Halaman Tambah Contact',
         errors: errors.array(),
       });
     } else {
-      addContact(req.body);
-      // kirimkan flash message
-      req.flash('msg', 'Data kontak berhasil ditambahkan!');
-      res.redirect('/contacts');
+      Contact.insertMany(req.body, (error, result) => {
+        // kirimkan flash message
+        req.flash('msg', 'Data kontak berhasil ditambahkan!');
+        res.redirect('/contacts');
+      });
     }
   }
 );
 
 // proses delete kontak
-app.get('/contact/delete/:nama', (req, res) => {
-  const contact = findContact(req.params.nama);
-  if (!contact) {
-    res.status(404);
-  } else {
-    deleteContact(req.params.nama);
+app.delete('/contact', (req, res) => {
+  Contact.deleteOne({ nama: req.body.nama }).then(() => {
     req.flash('msg', 'Data kontak berhasil dihapus!');
     res.redirect('/contacts');
-  }
+  });
 });
 
 // form ubah data contact
-app.get('/contact/edit/:nama', (req, res) => {
-  const contact = findContact(req.params.nama);
+app.get('/contact/edit/:nama', async (req, res) => {
+  const contact = await Contact.findOne({ nama: req.params.nama });
 
   res.render('edit-contact', {
     layout: 'layouts/main-layouts',
@@ -122,12 +117,11 @@ app.get('/contact/edit/:nama', (req, res) => {
 });
 
 // proses ubah data
-app.post(
-  '/contact/update',
+app.put(
+  '/contact',
   [
-    body('nama').custom((value, { req }) => {
-      const duplikat = cekDuplikat(value);
-      console.log(duplikat);
+    body('nama').custom(async (value, { req }) => {
+      const duplikat = await Contact.findOne({ nama: value });
 
       if (value != req.body.oldName && duplikat) {
         throw new Error('Nama kontak sudah digunakan!');
@@ -140,7 +134,6 @@ app.post(
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // return res.status(400).json({ errors: errors.array() });
       res.render('edit-contact', {
         layout: 'layouts/main-layouts',
         title: 'Halaman Ubah Contact',
@@ -148,17 +141,27 @@ app.post(
         contact: req.body,
       });
     } else {
-      updateContact(req.body);
-      // kirimkan flash message
-      req.flash('msg', 'Data kontak berhasil diubah!');
-      res.redirect('/contacts');
+      Contact.updateOne(
+        { _id: req.body._id },
+        {
+          $set: {
+            nama: req.body.nama,
+            email: req.body.email,
+            noHP: req.body.noHP,
+          },
+        }
+      ).then(() => {
+        // kirimkan flash message
+        req.flash('msg', 'Data kontak berhasil diubah!');
+        res.redirect('/contacts');
+      });
     }
   }
 );
 
 // halaman detail kontak
-app.get('/contact/:nama', (req, res) => {
-  const contact = findContact(req.params.nama);
+app.get('/contact/:nama', async (req, res) => {
+  const contact = await Contact.findOne({ nama: req.params.nama });
   res.render('detail', {
     layout: 'layouts/main-layouts',
     title: 'Halaman Detail Contact',
